@@ -1,6 +1,6 @@
 package com.billing.WifiBilling.model;
 
-import jakarta.persistence.*; //What's the purpose of this library
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
