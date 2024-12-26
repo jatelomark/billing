@@ -18,6 +18,10 @@ public class UserServiceimpl implements UserService{
     }
 
     @Override
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
+    @Override
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
