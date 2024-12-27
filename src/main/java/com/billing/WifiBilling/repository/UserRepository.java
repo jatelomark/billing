@@ -1,11 +1,10 @@
-package com.billing.WifiBilling.repository;
+package com.billing.WifiBilling.dto;
 
-import com.billing.WifiBilling.model.User; // Import the User model
-import org.springframework.data.jpa.repository.JpaRepository; // Import Spring Data JPA repository interface
+import lombok.Data; // Import Lombok for automatic getters and setters
 
-import java.util.Optional; // Import Optional for nullable types
-
-// Interface for user data access, extending JpaRepository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email); // Find a user by their email address
+@Data // Generate getters, setters, and other utility methods automatically
+public class UserResponseDto {
+    private Long id; // Unique identifier of the user
+    private String userName; // User's name
+    private String email; // User's email address
 }
