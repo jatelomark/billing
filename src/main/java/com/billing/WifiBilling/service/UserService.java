@@ -1,24 +1,27 @@
 package com.billing.WifiBilling.service;
 
+import com.billing.WifiBilling.dto.UserUpdateDto;
 import com.billing.WifiBilling.model.User;
+import com.billing.WifiBilling.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
-public interface UserService {
-    // Add a new user
-    User saveUser (User user);
+@Service
+public class UserService {
 
-    // Get all users
-    List<User> getAllUsers();
+    @Autowired
+    private UserRepository userRepository;
 
-    User getUserById(Long id);
+    public User updateUser(Long id, @Valid UserUpdateDto userUpdateDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
 
-    User getUserByEmail(String email);
+        user.setUserName(userUpdateDto.getUserName());
+        user.setEmail(userUpdateDto.getEmail());
+        user.setPassword(userUpdateDto.getPassword()); // Make sure to handle the password securely
 
-    void deleteUserById(Long id);
-
-    void deleteUserByEmail(String email);
-
-    //Count the total number of Users
-    long getTotalUsers();
+        return userRepository.save(user);
+    }
 }

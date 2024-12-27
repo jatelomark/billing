@@ -1,21 +1,11 @@
 package com.billing.WifiBilling.repository;
 
-import com.billing.WifiBilling.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.billing.WifiBilling.model.User; // Import the User model
+import org.springframework.data.jpa.repository.JpaRepository; // Import Spring Data JPA repository interface
 
-import java.util.List;
+import java.util.Optional; // Import Optional for nullable types
 
-@Repository
+// Interface for user data access, extending JpaRepository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
-
-    List<User> findByUsername(String userName);
-
-    boolean existsByEmail(String email);
-
-    void deleteByEmail(String email);
-
-    //Count the total number of users; for analytics and dashboard features
-    long count();
+    Optional<User> findByEmail(String email); // Find a user by their email address
 }
