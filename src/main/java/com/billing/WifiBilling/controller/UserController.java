@@ -1,64 +1,71 @@
 package com.billing.WifiBilling.controller;
 
-import com.billing.WifiBilling.model.User;
-import com.billing.WifiBilling.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.billing.WifiBilling.dto.UserCreateDto; // Import DTO for user creation
+import com.billing.WifiBilling.dto.UserResponseDto; // Import DTO for user responses
+import com.billing.WifiBilling.model.User; // Import User model
+import com.billing.WifiBilling.service.UserService; // Import UserService for business logic
+import org.springframework.beans.factory.annotation.Autowired; // Import Spring's Autowired annotation
+import org.springframework.data.domain.Page; // Import Page interface for pagination
+import org.springframework.data.domain.Pageable; // Import Pageable interface for pagination requests
+import org.springframework.http.HttpStatus; // Import HttpStatus for response status
+import org.springframework.http.ResponseEntity; // Import ResponseEntity for standard responses
+import org.springframework.web.bind.annotation.*; // Import Spring Web annotations
+import javax.validation.Valid; // Import for validation annotations
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/users") //base endpoint for user-related operations
+@RestController // Mark this class as a REST controller
+@RequestMapping("/api/users") // Base URL for user-related APIs
 public class UserController {
 
-    private final UserService userService;
+    private final UserService userService; // Dependency injection of UserService
 
-    @Autowired
-    public UserController(UserService userService){
+    @Autowired // Automatically inject the UserService
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    // Endpoint to create a new user
     @PostMapping
-    public ResponseEntity<User> createUser (@RequestBody User user){
-        User newUser = userService.saveUser(user);
-        return ResponseEntity.ok(newUser);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
+        User newUser = userService.saveUser(userCreateDto); // Create a new user using the service
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertToResponseDto(newUser)); // Return created response
     }
 
+    // Endpoint to get all users with pagination
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<Page<UserResponseDto>> getAllUsers(Pageable pageable) {
+        Page<User> users = userService.getAllUsers(pageable); // Retrieve users with pagination
+        Page<UserResponseDto> response = users.map(this::convertToResponseDto); // Map users to response DTOs
+        return ResponseEntity.ok(response); // Return response with users
     }
 
+    // Endpoint to get a user by ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id); // Retrieve the user by ID
+        return ResponseEntity.ok(convertToResponseDto(user)); // Return the user response
     }
 
-    @GetMapping("/email")
-    public ResponseEntity<User> getUserByEmail(@RequestParam String email){
-        User user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(user);
+    // Endpoint to update an existing user
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id,
+                                                      @Valid @RequestBody UserCreateDto userCreateDto) {
+        User updatedUser = userService.updateUser(id, userCreateDto); // Update the user
+        return ResponseEntity.ok(convertToResponseDto(updatedUser)); // Return updated user response
     }
 
+    // Endpoint to delete a user by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUserByEmail(@PathVariable long id){
-        userService.deleteUserById(id);
-        return ResponseEntity.ok("User deleted successfully");
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
+        userService.deleteUserById(id); // Delete the user
+        return ResponseEntity.ok("User deleted successfully"); // Return success message
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> deleteUserByEmail(@RequestParam String email){
-        userService.deleteUserByEmail(email);
-        return ResponseEntity.ok("User deleted successfully.");
-    }
-
-    @GetMapping("/count")
-    public ResponseEntity<Long> getTotalUsers(){
-        long count = userService.getTotalUsers();
-        return ResponseEntity.ok(count);
+    // Helper method to convert User entity to UserResponseDto
+    private UserResponseDto convertToResponseDto(User user) {
+        UserResponseDto responseDto = new UserResponseDto(); // Create new response DTO
+        responseDto.setId(user.getId()); // Set user ID
+        responseDto.setUserName(user.getUserName()); // Set user name
+        responseDto.setEmail(user.getEmail()); // Set user email
+        return responseDto; // Return the response DTO
     }
 }
