@@ -1,4 +1,8 @@
-package com.billing.WifiBilling.exceptions;
+package com.billing.WifiBilling.exception;
 
-public class UserNotFoundException {
+// Custom exception class for user not found scenarios
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message); // Call parent (RuntimeException) constructor
+    }
 }
